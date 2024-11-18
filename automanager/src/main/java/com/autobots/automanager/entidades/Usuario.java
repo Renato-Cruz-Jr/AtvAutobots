@@ -1,8 +1,8 @@
-package com.autobots.automanager.entitades;
+package com.autobots.automanager.entidades;
 
 import java.util.HashSet;
 import java.util.Set;
-
+import org.springframework.hateoas.RepresentationModel;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -22,7 +22,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(exclude = { "mercadorias", "vendas", "veiculos" })
 @Entity
-public class Usuario {
+public class Usuario extends RepresentationModel<Usuario> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

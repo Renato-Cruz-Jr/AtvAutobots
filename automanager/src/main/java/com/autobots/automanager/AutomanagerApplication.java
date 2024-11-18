@@ -7,17 +7,17 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.autobots.automanager.entitades.CredencialUsuarioSenha;
-import com.autobots.automanager.entitades.Documento;
-import com.autobots.automanager.entitades.Email;
-import com.autobots.automanager.entitades.Empresa;
-import com.autobots.automanager.entitades.Endereco;
-import com.autobots.automanager.entitades.Mercadoria;
-import com.autobots.automanager.entitades.Servico;
-import com.autobots.automanager.entitades.Telefone;
-import com.autobots.automanager.entitades.Usuario;
-import com.autobots.automanager.entitades.Veiculo;
-import com.autobots.automanager.entitades.Venda;
+import com.autobots.automanager.entidades.CredencialUsuarioSenha;
+import com.autobots.automanager.entidades.Documento;
+import com.autobots.automanager.entidades.Email;
+import com.autobots.automanager.entidades.Empresa;
+import com.autobots.automanager.entidades.Endereco;
+import com.autobots.automanager.entidades.Mercadoria;
+import com.autobots.automanager.entidades.Servico;
+import com.autobots.automanager.entidades.Telefone;
+import com.autobots.automanager.entidades.Usuario;
+import com.autobots.automanager.entidades.Veiculo;
+import com.autobots.automanager.entidades.Venda;
 import com.autobots.automanager.enumeracoes.PerfilUsuario;
 import com.autobots.automanager.enumeracoes.TipoDocumento;
 import com.autobots.automanager.enumeracoes.TipoVeiculo;
@@ -152,51 +152,51 @@ public class AutomanagerApplication implements CommandLineRunner {
 
 		fornecedor.getMercadorias().add(rodaLigaLeve);
 
-		Usuario cliente = new Usuario();
-		cliente.setNome("Pedro Alcântara de Bragança e Bourbon");
-		cliente.setNomeSocial("Dom pedro cliente");
-		cliente.getPerfis().add(PerfilUsuario.CLIENTE);
+		Usuario usuario = new Usuario();
+		usuario.setNome("Pedro Alcântara de Bragança e Bourbon");
+		usuario.setNomeSocial("Dom pedro cliente");
+		usuario.getPerfis().add(PerfilUsuario.CLIENTE);
 
-		Email emailCliente = new Email();
-		emailCliente.setEndereco("c@c.com");
+		Email emailUsuario = new Email();
+		emailUsuario.setEndereco("c@c.com");
 
-		cliente.getEmails().add(emailCliente);
+		usuario.getEmails().add(emailUsuario);
 
-		Documento cpfCliente = new Documento();
-		cpfCliente.setDataEmissao(new Date());
-		cpfCliente.setNumero("12584698533");
-		cpfCliente.setTipo(TipoDocumento.CPF);
+		Documento cpfUsuario = new Documento();
+		cpfUsuario.setDataEmissao(new Date());
+		cpfUsuario.setNumero("12584698533");
+		cpfUsuario.setTipo(TipoDocumento.CPF);
 
-		cliente.getDocumentos().add(cpfCliente);
+		usuario.getDocumentos().add(cpfUsuario);
 
-		CredencialUsuarioSenha credencialCliente = new CredencialUsuarioSenha();
-		credencialCliente.setInativo(false);
-		credencialCliente.setNomeUsuario("dompedrocliente");
-		credencialCliente.setSenha("123456");
-		credencialCliente.setCriacao(new Date());
-		credencialCliente.setUltimoAcesso(new Date());
+		CredencialUsuarioSenha credencialUsuario = new CredencialUsuarioSenha();
+		credencialUsuario.setInativo(false);
+		credencialUsuario.setNomeUsuario("dompedrousuario");
+		credencialUsuario.setSenha("123456");
+		credencialUsuario.setCriacao(new Date());
+		credencialUsuario.setUltimoAcesso(new Date());
 
-		cliente.getCredenciais().add(credencialCliente);
+		usuario.getCredenciais().add(credencialUsuario);
 
-		Endereco enderecoCliente = new Endereco();
-		enderecoCliente.setEstado("São Paulo");
-		enderecoCliente.setCidade("São José dos Campos");
-		enderecoCliente.setBairro("Centro");
-		enderecoCliente.setRua("Av. Dr. Nelson D'Ávila");
-		enderecoCliente.setNumero("00");
-		enderecoCliente.setCodigoPostal("12245-070");
+		Endereco enderecoUsuario = new Endereco();
+		enderecoUsuario.setEstado("São Paulo");
+		enderecoUsuario.setCidade("São José dos Campos");
+		enderecoUsuario.setBairro("Centro");
+		enderecoUsuario.setRua("Av. Dr. Nelson D'Ávila");
+		enderecoUsuario.setNumero("00");
+		enderecoUsuario.setCodigoPostal("12245-070");
 
-		cliente.setEndereco(enderecoCliente);
+		usuario.setEndereco(enderecoUsuario);
 		
 		Veiculo veiculo = new Veiculo();
 		veiculo.setPlaca("ABC-0000");
 		veiculo.setModelo("corolla-cross");
 		veiculo.setTipo(TipoVeiculo.SUV);
-		veiculo.setProprietario(cliente);
+		veiculo.setProprietario(usuario);
 		
-		cliente.getVeiculos().add(veiculo);
+		usuario.getVeiculos().add(veiculo);
 		
-		empresa.getUsuarios().add(cliente);
+		empresa.getUsuarios().add(usuario);
 
 		Servico trocaRodas = new Servico();
 		trocaRodas.setDescricao("Troca das rodas do carro por novas");
@@ -213,7 +213,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 
 		Venda venda = new Venda();
 		venda.setCadastro(new Date());
-		venda.setCliente(cliente);
+		venda.setUsuario(usuario);
 		venda.getMercadorias().add(rodaLigaLeve);
 		venda.setIdentificacao("1234698745");
 		venda.setFuncionario(funcionario);
@@ -247,7 +247,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 		
 		Venda venda2 = new Venda();
 		venda2.setCadastro(new Date());
-		venda2.setCliente(cliente);
+		venda2.setUsuario(usuario);
 		venda2.getMercadorias().add(rodaLigaLeve2);
 		venda2.setIdentificacao("1234698749");
 		venda2.setFuncionario(funcionario);
