@@ -1,7 +1,8 @@
 package com.autobots.automanager;
 
 import java.util.Date;
-
+import java.util.Map;
+import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -30,7 +31,11 @@ public class AutomanagerApplication implements CommandLineRunner {
 	private RepositorioEmpresa repositorioEmpresa;
 
 	public static void main(String[] args) {
-		SpringApplication.run(AutomanagerApplication.class, args);
+		Map<String, Object> configuracao = new HashMap<>();
+		configuracao.put("server.port", "8080");
+		SpringApplication app = new SpringApplication(AutomanagerApplication.class);
+		app.setDefaultProperties(configuracao);
+		app.run(args);
 	}
 
 	@Override
@@ -138,7 +143,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 		fornecedor.setEndereco(enderecoFornecedor);
 
 		empresa.getUsuarios().add(fornecedor);
-		
+
 		Mercadoria rodaLigaLeve = new Mercadoria();
 		rodaLigaLeve.setCadastro(new Date());
 		rodaLigaLeve.setFabricao(new Date());
@@ -187,15 +192,15 @@ public class AutomanagerApplication implements CommandLineRunner {
 		enderecoUsuario.setCodigoPostal("12245-070");
 
 		usuario.setEndereco(enderecoUsuario);
-		
+
 		Veiculo veiculo = new Veiculo();
 		veiculo.setPlaca("ABC-0000");
 		veiculo.setModelo("corolla-cross");
 		veiculo.setTipo(TipoVeiculo.SUV);
 		veiculo.setProprietario(usuario);
-		
+
 		usuario.getVeiculos().add(veiculo);
-		
+
 		empresa.getUsuarios().add(usuario);
 
 		Servico trocaRodas = new Servico();
@@ -213,7 +218,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 
 		Venda venda = new Venda();
 		venda.setCadastro(new Date());
-		venda.setUsuario(usuario);
+		venda.setCliente(usuario);
 		venda.getMercadorias().add(rodaLigaLeve);
 		venda.setIdentificacao("1234698745");
 		venda.setFuncionario(funcionario);
@@ -225,7 +230,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 		empresa.getVendas().add(venda);
 
 		repositorioEmpresa.save(empresa);
-		
+
 		Mercadoria rodaLigaLeve2 = new Mercadoria();
 		rodaLigaLeve2.setCadastro(new Date());
 		rodaLigaLeve2.setFabricao(new Date());
@@ -234,20 +239,20 @@ public class AutomanagerApplication implements CommandLineRunner {
 		rodaLigaLeve2.setQuantidade(30);
 		rodaLigaLeve2.setValor(300.0);
 		rodaLigaLeve2.setDescricao("Roda de liga leve original de fábrica da toyta para modelos do tipo hatch");
-		
+
 		Servico alinhamento2 = new Servico();
 		alinhamento2.setDescricao("Alinhamento das rodas do carro");
 		alinhamento2.setNome("Alinhamento de rodas");
 		alinhamento2.setValor(50);
-		
+
 		Servico balanceamento = new Servico();
 		balanceamento.setDescricao("balanceamento das rodas do carro");
 		balanceamento.setNome("balanceamento de rodas");
 		balanceamento.setValor(30);
-		
+
 		Venda venda2 = new Venda();
 		venda2.setCadastro(new Date());
-		venda2.setUsuario(usuario);
+		venda2.setCliente(usuario);
 		venda2.getMercadorias().add(rodaLigaLeve2);
 		venda2.setIdentificacao("1234698749");
 		venda2.setFuncionario(funcionario);
@@ -257,7 +262,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 		veiculo.getVendas().add(venda2);
 
 		empresa.getVendas().add(venda2);
-		
+
 		repositorioEmpresa.save(empresa);
 
 	}
