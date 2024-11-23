@@ -3,7 +3,7 @@ package com.autobots.automanager.entidades;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
+import org.springframework.hateoas.RepresentationModel;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,12 +13,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import lombok.Getter;
+import lombok.Setter;
 
-import lombok.Data;
-
-@Data
+@Getter
+@Setter
 @Entity
-public class Empresa {
+public class Empresa extends RepresentationModel<Empresa> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

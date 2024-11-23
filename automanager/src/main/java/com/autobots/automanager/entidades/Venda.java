@@ -3,7 +3,6 @@ package com.autobots.automanager.entidades;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,14 +13,17 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
-@Data
-@EqualsAndHashCode(exclude = { "usuario", "funcionario", "veiculo" })
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = { "cliente", "funcionario", "veiculo" }, callSuper=false)
 @Entity
-public class Venda {
+public class Venda extends RepresentationModel<Venda> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -30,7 +32,8 @@ public class Venda {
 	@Column(nullable = false, unique = true)
 	private String identificacao;
 	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
-	private Usuario usuario;
+	@JsonBackReference
+	private Usuario cliente;
 	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	private Usuario funcionario;
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
@@ -38,5 +41,6 @@ public class Venda {
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	private Set<Servico> servicos = new HashSet<>();
 	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
+	@JsonBackReference
 	private Veiculo veiculo;
 }

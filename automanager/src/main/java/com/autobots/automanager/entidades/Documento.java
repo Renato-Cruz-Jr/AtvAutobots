@@ -9,10 +9,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import org.springframework.hateoas.RepresentationModel;
 import com.autobots.automanager.enumeracoes.TipoDocumento;
+import lombok.Getter;
+import lombok.Setter;
 
-import lombok.Data;
-
-@Data
+@Getter
+@Setter
 @Entity
 public class Documento extends RepresentationModel<Documento> {
 	@Id
