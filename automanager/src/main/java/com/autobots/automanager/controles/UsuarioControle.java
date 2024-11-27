@@ -1,92 +1,93 @@
 package com.autobots.automanager.controles;
 
-import java.util.List;
-
+import com.autobots.automanager.controles.dto.AtualizadorUsuarioDto;
+import com.autobots.automanager.controles.dto.CadastradorUsuarioDto;
+import com.autobots.automanager.entidades.Usuario;
+import com.autobots.automanager.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.autobots.automanager.entidades.Usuario;
-import com.autobots.automanager.modelos.AdicionadorLinkUsuario;
-import com.autobots.automanager.modelos.UsuarioAtualizador;
-import com.autobots.automanager.modelos.UsuarioSelecionador;
-import com.autobots.automanager.repositorios.UsuarioRepositorio;
+import java.util.List;
 
 @RestController
+@RequestMapping("/usuario")
 public class UsuarioControle {
-
     @Autowired
-    private UsuarioRepositorio repositorio;
+    private UsuarioService usuarioService;
 
-    @Autowired
-    private UsuarioSelecionador selecionador;
-
-    @Autowired
-    private AdicionadorLinkUsuario adicionadorLink;
-
-    @PostMapping("/usuario/cadastro")
-    public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        if (usuario.getId() == null) {
-            repositorio.save(usuario);
-            status = HttpStatus.CREATED;
-        }
-        return new ResponseEntity<>(status);
-    }
-
-    @GetMapping("/usuarios")
-    public ResponseEntity<List<Usuario>> obterUsuarios() {
-        List<Usuario> usuarios = repositorio.findAll();
+    @GetMapping("/listar")
+    public ResponseEntity<List<Usuario>> listarUsuarios() {
+        List<Usuario> usuarios = usuarioService.listarUsuarios();
         if (usuarios.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            adicionadorLink.adicionarLink(usuarios);
-            return new ResponseEntity<>(usuarios, HttpStatus.FOUND);
+            return ResponseEntity.noContent().build();
         }
+        return ResponseEntity.ok(usuarios);
     }
 
-    @GetMapping("/usuario/{id}")
-    public ResponseEntity<Usuario> obterUsuario(@PathVariable long id) {
-        List<Usuario> usuarios = repositorio.findAll();
-        Usuario usuario = selecionador.selecionar(usuarios, id);
+    @GetMapping("/visualizar/{id}")
+    public ResponseEntity<Usuario> visualizarUsuario(@PathVariable Long id) {
+        Usuario usuario = usuarioService.visualizarUsuario(id);
         if (usuario == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            adicionadorLink.adicionarLink(usuario);
-            return new ResponseEntity<>(usuario, HttpStatus.FOUND);
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(usuario);
+    }
+
+    @PostMapping("/cadastrar")
+    public ResponseEntity<?> cadastrarUsuario(@RequestBody CadastradorUsuarioDto usuario) {
+        try {
+            usuarioService.cadastrarUsuario(usuario);
+            return ResponseEntity.created(null).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    @PutMapping("/usuario/atualizar")
-    public ResponseEntity<?> atualizarUsuario(@RequestBody Usuario atualizacao) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        Usuario usuario = repositorio.getById(atualizacao.getId());
-        if (usuario != null) {
-            UsuarioAtualizador atualizador = new UsuarioAtualizador();
-            atualizador.atualizar(usuario, atualizacao);
-            repositorio.save(usuario);
-            status = HttpStatus.OK;
-        } else {
-            status = HttpStatus.BAD_REQUEST;
+    @PostMapping("/cadastrar/empresa/{idEmpresa}")
+    public ResponseEntity<?> cadastrarUsuarioEmpresa(@RequestBody CadastradorUsuarioDto usuario, @PathVariable Long idEmpresa) {
+        try {
+            usuarioService.cadastrarUsuarioEmpresa(usuario, idEmpresa);
+            return ResponseEntity.created(null).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return new ResponseEntity<>(status);
     }
 
-    @DeleteMapping("/usuario/excluir")
-    public ResponseEntity<?> excluirUsuario(@RequestBody Usuario exclusao) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        Usuario usuario = repositorio.getById(exclusao.getId());
-        if (usuario != null) {
-            repositorio.delete(usuario);
-            status = HttpStatus.OK;
+    @PutMapping("/vincular/{idUsuario}/empresa/{idEmpresa}")
+    public ResponseEntity<?> vincularUsuarioEmpresa(@PathVariable Long idUsuario, @PathVariable Long idEmpresa) {
+        try {
+            usuarioService.vincularUsuarioEmpresa(idUsuario, idEmpresa);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return new ResponseEntity<>(status);
+    }
+
+    @PutMapping("/desvincular/{idUsuario}/empresa/{idEmpresa}")
+    public ResponseEntity<?> desvincularUsuarioEmpresa(@PathVariable Long idUsuario, @PathVariable Long idEmpresa) {
+        try {
+            usuarioService.desvincularUsuarioEmpresa(idUsuario, idEmpresa);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody AtualizadorUsuarioDto usuario) {
+        ResponseEntity<?> resposta = usuarioService.atualizarUsuario(id, usuario);
+        return resposta;
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<?> deletarUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.deletarUsuario(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }
