@@ -1,7 +1,6 @@
 package com.autobots.automanager.entidades;
 
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,12 +8,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Credencial extends RepresentationModel<Credencial> {
@@ -27,4 +25,7 @@ public abstract class Credencial extends RepresentationModel<Credencial> {
 	private Date ultimoAcesso;
 	@Column(nullable = false)
 	private boolean inativo;
+
+	public Credencial() {
+	}
 }

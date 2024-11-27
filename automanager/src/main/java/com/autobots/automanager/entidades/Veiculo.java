@@ -1,26 +1,16 @@
 package com.autobots.automanager.entidades;
 
+import org.springframework.hateoas.RepresentationModel;
+import com.autobots.automanager.enumeracoes.TipoVeiculo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import java.util.HashSet;
 import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.springframework.hateoas.RepresentationModel;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import lombok.Getter;
-import lombok.Setter;
-import com.autobots.automanager.enumeracoes.TipoVeiculo;
-import lombok.EqualsAndHashCode;
+import javax.persistence.*;
 
-@Getter
-@Setter
-@EqualsAndHashCode(exclude = { "proprietario", "vendas" }, callSuper = false)
+@Data
+@EqualsAndHashCode(exclude = { "proprietario", "vendas" })
 @Entity
 public class Veiculo extends RepresentationModel<Veiculo> {
 	@Id
@@ -33,9 +23,9 @@ public class Veiculo extends RepresentationModel<Veiculo> {
 	@Column(nullable = false)
 	private String placa;
 	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
-	@JsonManagedReference
+	@JsonIgnoreProperties(value = {"veiculos", "endereco", "mercadorias", "vendas"})
 	private Usuario proprietario;
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
-	@JsonManagedReference
+	@JsonIgnoreProperties(value = {"veiculo", "endereco", "mercadorias", "vendas"})
 	private Set<Venda> vendas = new HashSet<>();
 }

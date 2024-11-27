@@ -3,21 +3,13 @@ package com.autobots.automanager.entidades;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import org.springframework.hateoas.RepresentationModel;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import lombok.Getter;
-import lombok.Setter;
+import javax.persistence.*;
 
-@Getter
-@Setter
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+import org.springframework.hateoas.RepresentationModel;
+
+@Data
 @Entity
 public class Empresa extends RepresentationModel<Empresa> {
 	@Id
@@ -34,6 +26,7 @@ public class Empresa extends RepresentationModel<Empresa> {
 	@Column(nullable = false)
 	private Date cadastro;
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JsonIgnoreProperties(value = { "credenciais" })
 	private Set<Usuario> usuarios = new HashSet<>();
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Mercadoria> mercadorias = new HashSet<>();

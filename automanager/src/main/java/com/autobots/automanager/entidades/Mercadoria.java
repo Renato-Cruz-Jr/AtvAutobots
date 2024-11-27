@@ -1,18 +1,11 @@
 package com.autobots.automanager.entidades;
 
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @Entity
 public class Mercadoria extends RepresentationModel<Mercadoria> {
 	@Id
