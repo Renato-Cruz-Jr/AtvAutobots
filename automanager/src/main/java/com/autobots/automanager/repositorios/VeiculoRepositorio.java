@@ -1,7 +1,7 @@
 package com.autobots.automanager.repositorios;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.autobots.automanager.entidades.Veiculo;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface VeiculoRepositorio extends JpaRepository<Veiculo, Long>{
+public interface VeiculoRepositorio extends JpaRepository<Veiculo, Long> {
 }
