@@ -1,21 +1,22 @@
 package com.autobots.automanager.services;
 
 import com.autobots.automanager.adicionadoresLinks.AdicionadorLinkVenda;
+import com.autobots.automanager.atualizadores.MercadoriaAtualizador;
+import com.autobots.automanager.atualizadores.ServicoAtualizador;
+import com.autobots.automanager.cadastradores.VendaCadastro;
 import com.autobots.automanager.controles.dto.AtualizadorVendaDto;
 import com.autobots.automanager.entidades.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import com.autobots.automanager.enumeracoes.PerfilUsuario;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
 import com.autobots.automanager.repositorios.UsuarioRepositorio;
 import com.autobots.automanager.repositorios.VeiculoRepositorio;
 import com.autobots.automanager.repositorios.VendaRepositorio;
-import com.autobots.automanager.atualizadores.MercadoriaAtualizador;
-import com.autobots.automanager.atualizadores.ServicoAtualizador;
-import com.autobots.automanager.cadastradores.VendaCadastro;
+import com.autobots.automanager.utilitarios.UsuarioSelecionador;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class VendaService {
@@ -43,6 +44,24 @@ public class VendaService {
 
     @Autowired
     private ServicoAtualizador servicoAtualizador;
+
+    @Autowired
+    private UsuarioSelecionador usuarioSelecionador;
+
+    public List<Venda> listarVendas(String username) {
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioSelecionado = usuarioSelecionador.selecionarUsuarioNome(usuarios, username);
+        List<Venda> vendas = new ArrayList<Venda>();
+        if (usuarioSelecionado.getPerfis().contains(PerfilUsuario.ROLE_ADMIN) || usuarioSelecionado.getPerfis().contains(PerfilUsuario.ROLE_GERENTE)) {
+            vendas = vendaRepositorio.findAll();
+        } else if(usuarioSelecionado.getPerfis().contains(PerfilUsuario.ROLE_VENDEDOR)) {
+            vendas = vendaRepositorio.findByFuncionarioId(usuarioSelecionado.getId());
+        } else if(usuarioSelecionado.getPerfis().contains(PerfilUsuario.ROLE_CLIENTE)) {
+            vendas = vendaRepositorio.findByClienteId(usuarioSelecionado.getId());
+        }
+        adicionadorLinkVenda.adicionarLink(vendas);
+        return vendas;
+    }
 
     public List<Venda> listarVendas() {
         List<Venda> vendas = vendaRepositorio.findAll();
@@ -80,12 +99,26 @@ public class VendaService {
         return vendasLista;
     }
 
-    public void cadastrarVenda(Venda venda) {
+    public void cadastrarVenda(Venda venda, String usuarioNome) {
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuario = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
+        if (usuario.getPerfis().contains(PerfilUsuario.ROLE_VENDEDOR)) {
+            if (usuario.getId().equals(venda.getFuncionario().getId())) {
+                throw new IllegalArgumentException("Usuário não autorizado");
+            }
+        }
         Venda vendaCadastrada = vendaCadastro.cadastrarVenda(venda);
         vendaRepositorio.save(vendaCadastrada);
     }
 
-    public void cadastrarVendaEmpresa(Long idEmpresa, Venda venda) {
+    public void cadastrarVendaEmpresa(Long idEmpresa, Venda venda, String usuarioNome) {
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuario = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
+        if (usuario.getPerfis().contains(PerfilUsuario.ROLE_VENDEDOR)) {
+            if (usuario.getId().equals(venda.getFuncionario().getId())) {
+                throw new IllegalArgumentException("Usuário não autorizado");
+            }
+        }
         Empresa empresa = repositorioEmpresa.findById(idEmpresa).orElse(null);
         if (empresa == null) {
             throw new IllegalArgumentException("Empresa não encontrada");
@@ -95,10 +128,17 @@ public class VendaService {
         repositorioEmpresa.save(empresa);
     }
 
-    public void cadastrarVendaUsuario(Long idUsuario, Venda venda, String tipoUsuario) {
+    public void cadastrarVendaUsuario(Long idUsuario, Venda venda, String tipoUsuario, String usuarioNome) {
         Usuario usuario = usuarioRepositorio.findById(idUsuario).orElse(null);
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não encontrado");
+        }
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioSelecionado = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
+        if (usuarioSelecionado.getPerfis().contains(PerfilUsuario.ROLE_VENDEDOR)) {
+            if (usuarioSelecionado.getId().equals(venda.getFuncionario().getId())) {
+                throw new IllegalArgumentException("Usuário não autorizado");
+            }
         }
         Venda vendaCadastrada = vendaCadastro.cadastrarVenda(venda);
         if (tipoUsuario.equalsIgnoreCase("cliente")) {
@@ -144,7 +184,6 @@ public class VendaService {
             if (venda.veiculo().isPresent()) {
                 vendaAtualizada.setVeiculo(venda.veiculo().get());
             }
-
             vendaRepositorio.save(vendaAtualizada);
         }
     }
@@ -218,23 +257,19 @@ public class VendaService {
         if (venda == null) {
             throw new IllegalArgumentException("Venda não encontrada");
         }
-
         List<Usuario> usuarios = usuarioRepositorio.findAll();
         for (Usuario usuario : usuarios) {
             usuario.getVendas().remove(venda);
             usuarioRepositorio.save(usuario);
         }
-
         List<Empresa> empresas = repositorioEmpresa.findAll();
         for (Empresa empresa : empresas) {
             empresa.getVendas().remove(venda);
             repositorioEmpresa.save(empresa);
         }
-
         Veiculo veiculo = venda.getVeiculo();
         veiculo.getVendas().remove(venda);
         vendaRepositorio.save(venda);
-
         vendaRepositorio.delete(venda);
     }
 }

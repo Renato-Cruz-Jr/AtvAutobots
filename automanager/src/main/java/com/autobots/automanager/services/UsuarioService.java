@@ -1,18 +1,22 @@
 package com.autobots.automanager.services;
 
 import com.autobots.automanager.adicionadoresLinks.AdicionadorLinkUsuario;
-import com.autobots.automanager.controles.dto.AtualizadorUsuarioDto;
-import com.autobots.automanager.controles.dto.CadastradorUsuarioDto;
-import com.autobots.automanager.entidades.*;
-import com.autobots.automanager.repositorios.*;
 import com.autobots.automanager.atualizadores.DocumentoAtualizador;
 import com.autobots.automanager.atualizadores.EmailAtualizador;
 import com.autobots.automanager.atualizadores.TelefoneAtualizador;
 import com.autobots.automanager.cadastradores.UsuarioCadastro;
+import com.autobots.automanager.controles.dto.AtualizadorUsuarioDto;
+import com.autobots.automanager.controles.dto.CadastradorUsuarioDto;
+import com.autobots.automanager.entidades.*;
+import com.autobots.automanager.enumeracoes.PerfilUsuario;
+import com.autobots.automanager.repositorios.*;
+import com.autobots.automanager.utilitarios.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,6 +49,28 @@ public class UsuarioService {
     @Autowired
     private EmailAtualizador emailAtualizador;
 
+    @Autowired
+    private UsuarioSelecionador usuarioSelecionador;
+
+    @Autowired
+    private VerificadorPermissao verificadorPermissao;
+
+    public List<Usuario> listarUsuarios(String usuarioNome) {
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioLogado = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
+
+        if (usuarioLogado.getPerfis().contains(PerfilUsuario.ROLE_GERENTE)) {
+            usuarios = usuarioSelecionador.selecionarPorCargo(usuarios, PerfilUsuario.ROLE_GERENTE);
+        } else if (usuarioLogado.getPerfis().contains(PerfilUsuario.ROLE_VENDEDOR)) {
+            usuarios = usuarioSelecionador.selecionarPorCargo(usuarios, PerfilUsuario.ROLE_VENDEDOR);
+        } else if (usuarioLogado.getPerfis().contains(PerfilUsuario.ROLE_CLIENTE)) {
+            usuarios = new ArrayList<Usuario>();
+            usuarios.add(usuarioLogado);
+        }
+        adicionadorLinkUsuario.adicionarLink(usuarios);
+        return usuarios;
+    }
+
     public List<Usuario> listarUsuarios() {
         List<Usuario> usuarios = usuarioRepositorio.findAll();
         adicionadorLinkUsuario.adicionarLink(usuarios);
@@ -59,12 +85,30 @@ public class UsuarioService {
         return usuario;
     }
 
-    public void cadastrarUsuario(CadastradorUsuarioDto usuario) {
+    public void cadastrarUsuario(String usuarioNome, CadastradorUsuarioDto usuario) {
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioLogado = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
+
+        boolean permitido = verificadorPermissao.verificar(usuarioLogado.getPerfis(),usuario.perfis());
+
+        if (!permitido) {
+            throw new IllegalArgumentException("Usuário sem permissão para cadastrar usuário");
+        }
+
         Usuario usuarioCadastrado = usuarioCadastro.cadastrarUsuario(usuario);
         usuarioRepositorio.save(usuarioCadastrado);
     }
 
-    public void cadastrarUsuarioEmpresa(CadastradorUsuarioDto usuario, Long idEmpresa) {
+    public void cadastrarUsuarioEmpresa(CadastradorUsuarioDto usuario, Long idEmpresa, String usuarioNome) {
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioLogado = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
+
+        boolean permitido = verificadorPermissao.verificar(usuarioLogado.getPerfis(),usuario.perfis());
+
+        if (!permitido) {
+            throw new IllegalArgumentException("Usuário sem permissão para cadastrar usuário");
+        }
+
         Empresa empresa = repositorioEmpresa.findById(idEmpresa).orElse(null);
         if (empresa == null) {
             throw new IllegalArgumentException("Empresa não encontrada");
@@ -75,11 +119,21 @@ public class UsuarioService {
         repositorioEmpresa.save(empresa);
     }
 
-    public void vincularUsuarioEmpresa(Long idUsuario, Long idEmpresa) {
+    public void vincularUsuarioEmpresa(Long idUsuario, Long idEmpresa, String usuarioNome) {
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioLogado = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
         Usuario usuario = usuarioRepositorio.findById(idUsuario).orElse(null);
+
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não encontrado");
         }
+
+        boolean permitido = verificadorPermissao.verificar(usuarioLogado.getPerfis(), usuario.getPerfis());
+
+        if (!permitido) {
+            throw new IllegalArgumentException("Usuário sem permissão para cadastrar usuário");
+        }
+
         Empresa empresa = repositorioEmpresa.findById(idEmpresa).orElse(null);
         if (empresa == null) {
             throw new IllegalArgumentException("Empresa não encontrada");
@@ -88,11 +142,22 @@ public class UsuarioService {
         repositorioEmpresa.save(empresa);
     }
 
-    public void desvincularUsuarioEmpresa(Long idUsuario, Long idEmpresa) {
+    public void desvincularUsuarioEmpresa(Long idUsuario, Long idEmpresa, String usuarioNome) {
+
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioLogado = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
         Usuario usuario = usuarioRepositorio.findById(idUsuario).orElse(null);
+
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não encontrado");
         }
+
+        boolean permitido = verificadorPermissao.verificar(usuarioLogado.getPerfis(), usuario.getPerfis());
+
+        if (!permitido) {
+            throw new IllegalArgumentException("Usuário sem permissão para cadastrar usuário");
+        }
+
         Empresa empresa = repositorioEmpresa.findById(idEmpresa).orElse(null);
         if (empresa == null) {
             throw new IllegalArgumentException("Empresa não encontrada");
@@ -101,9 +166,21 @@ public class UsuarioService {
         repositorioEmpresa.save(empresa);
     }
 
-    public ResponseEntity<?> atualizarUsuario(Long id, AtualizadorUsuarioDto usuario) {
+    public ResponseEntity<?> atualizarUsuario(Long id, AtualizadorUsuarioDto usuario, String usuarioNome) {
+
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioLogado = usuarioSelecionador.selecionarUsuarioNome(usuarios, usuarioNome);
         Usuario usuarioAtual = usuarioRepositorio.findById(id).orElse(null);
+
+
         if (usuarioAtual != null) {
+
+            boolean permitido = verificadorPermissao.verificar(usuarioLogado.getPerfis(), usuarioAtual.getPerfis());
+
+            if (!permitido) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+
             if (usuario.nome().isPresent()) {
                 usuarioAtual.setNome(usuario.nome().get());
             }
@@ -143,8 +220,8 @@ public class UsuarioService {
                     }
                 }
             }
-            if (usuario.credenciais().isPresent()) {
-                usuarioAtual.getCredenciais().addAll(usuario.credenciais().get());
+            if (usuario.credencial().isPresent()) {
+                usuarioAtual.setCredencial(usuario.credencial().get());
             }
             if (usuario.mercadorias().isPresent()) {
                 usuarioAtual.getMercadorias().addAll(usuario.mercadorias().get());
@@ -162,8 +239,18 @@ public class UsuarioService {
         }
     }
 
-    public void deletarUsuario(Long id) {
+    public void deletarUsuario(Long id, String username) {
+
+        List<Usuario> usuarios = usuarioRepositorio.findAll();
+        Usuario usuarioLogado = usuarioSelecionador.selecionarUsuarioNome(usuarios, username);
         Usuario usuario = usuarioRepositorio.findById(id).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        boolean permitido = verificadorPermissao.verificar(usuarioLogado.getPerfis(), usuario.getPerfis());
+
+        if (!permitido) {
+            throw new IllegalArgumentException("Usuário sem permissão para deletar usuário");
+        }
+
         List<Venda> vendas = vendaRepositorio.findAll();
         for (Venda venda : vendas) {
             if (venda.getCliente() == usuario) {
@@ -195,7 +282,7 @@ public class UsuarioService {
 
         usuario.getEmails().clear();
 
-        usuario.getCredenciais().clear();
+        usuario.setCredencial(null);
 
         usuario.getMercadorias().clear();
 
