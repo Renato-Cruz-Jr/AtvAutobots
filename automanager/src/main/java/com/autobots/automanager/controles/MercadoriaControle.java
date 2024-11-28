@@ -6,8 +6,8 @@ import com.autobots.automanager.services.MercadoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -17,6 +17,7 @@ public class MercadoriaControle {
     @Autowired
     private MercadoriaService mercadoriaService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE', 'VENDEDOR')")
     @GetMapping("/listar")
     public ResponseEntity<List<Mercadoria>> listarMercadorias() {
         List<Mercadoria> mercadorias = mercadoriaService.listarMercadorias();
@@ -26,6 +27,7 @@ public class MercadoriaControle {
         return ResponseEntity.ok(mercadorias);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE', 'VENDEDOR')")
     @GetMapping("/visualizar/{id}")
     public ResponseEntity<Mercadoria> visualizarMercadoria(@PathVariable Long id) {
         Mercadoria mercadoria = mercadoriaService.visualizarMercadoria(id);
@@ -35,6 +37,7 @@ public class MercadoriaControle {
         return ResponseEntity.ok(mercadoria);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE', 'VENDEDOR')")
     @GetMapping("/visualizar/empresa/{idEmpresa}")
     public ResponseEntity<List<Mercadoria>> visualizarMercadoriaEmpresa(@PathVariable Long idEmpresa) {
         List<Mercadoria> mercadorias = mercadoriaService.visualizarMercadoriaEmpresa(idEmpresa);
@@ -44,6 +47,7 @@ public class MercadoriaControle {
         return ResponseEntity.ok(mercadorias);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE', 'VENDEDOR')")
     @GetMapping("/visualizar/usuario/{idUsuario}")
     public ResponseEntity<List<Mercadoria>> visualizarMercadoriaUsuario(@PathVariable Long idUsuario) {
         List<Mercadoria> mercadorias = mercadoriaService.visualizarMercadoriaUsuario(idUsuario);
@@ -53,6 +57,7 @@ public class MercadoriaControle {
         return ResponseEntity.ok(mercadorias);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarMercadoria(@RequestBody CadastradorMercadoriaDto mercadoria) {
         try {
@@ -63,6 +68,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PostMapping("/cadastrar/empresa/{idEmpresa}")
     public ResponseEntity<?> cadastrarMercadoriaEmpresa(@RequestBody CadastradorMercadoriaDto mercadoria, @PathVariable Long idEmpresa) {
         try {
@@ -73,6 +79,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PostMapping("/cadastrar/usuario/{idUsuario}")
     public ResponseEntity<?> cadastrarMercadoriaUsuario(@RequestBody CadastradorMercadoriaDto mercadoria, @PathVariable Long idUsuario) {
         try {
@@ -83,6 +90,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<?> atualizarMercadoria(@PathVariable Long id, @RequestBody Mercadoria mercadoria) {
         try {
@@ -93,6 +101,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PutMapping("/vincular/{idMercadoria}/empresa/{idEmpresa}")
     public ResponseEntity<?> vincularMercadoriaEmpresa(@PathVariable Long idMercadoria, @PathVariable Long idEmpresa) {
         try {
@@ -103,6 +112,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PutMapping("/vincular/{idMercadoria}/usuario/{idUsuario}")
     public ResponseEntity<?> vincularMercadoriaUsuario(@PathVariable Long idMercadoria, @PathVariable Long idUsuario) {
         try {
@@ -113,6 +123,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PutMapping("/desvincular/{idMercadoria}/empresa/{idEmpresa}")
     public ResponseEntity<?> desvincularMercadoriaEmpresa(@PathVariable Long idMercadoria, @PathVariable Long idEmpresa) {
         try {
@@ -123,6 +134,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @PutMapping("/desvincular/{idMercadoria}/usuario/{idUsuario}")
     public ResponseEntity<?> desvincularMercadoriaUsuario(@PathVariable Long idMercadoria, @PathVariable Long idUsuario) {
         try {
@@ -133,6 +145,7 @@ public class MercadoriaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> deletarMercadoria(@PathVariable Long id) {
         try {

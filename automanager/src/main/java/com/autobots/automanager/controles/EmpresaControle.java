@@ -2,12 +2,12 @@ package com.autobots.automanager.controles;
 
 import com.autobots.automanager.entidades.Empresa;
 import com.autobots.automanager.services.EmpresaService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/empresa")
@@ -15,6 +15,7 @@ public class EmpresaControle {
     @Autowired
     private EmpresaService empresaService;
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/listar")
     public ResponseEntity<List<Empresa>> listarEmpresas() {
         List<Empresa> empresas = empresaService.listarEmpresas();
@@ -24,6 +25,7 @@ public class EmpresaControle {
         return ResponseEntity.ok(empresas);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/visualizar/{id}")
     public ResponseEntity<Empresa> visualizarEmpresa(@PathVariable Long id) {
         Empresa empresa = empresaService.visualizarEmpresa(id);
@@ -33,8 +35,10 @@ public class EmpresaControle {
         return ResponseEntity.ok(empresa);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarEmpresa(@RequestBody Empresa empresa) {
+        System.out.println(empresa);
         try {
             empresaService.cadastrarEmpresa(empresa);
             return ResponseEntity.created(null).build();
@@ -43,12 +47,14 @@ public class EmpresaControle {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<?> atualizarEmpresa(@PathVariable Long id, @RequestBody Empresa empresa) {
         ResponseEntity<?> resposta = empresaService.atualizarEmpresa(id, empresa);
         return resposta;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> deletarEmpresa(@PathVariable Long id) {
         try {
@@ -59,4 +65,3 @@ public class EmpresaControle {
         }
     }
 }
-

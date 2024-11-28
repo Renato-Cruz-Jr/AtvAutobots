@@ -12,7 +12,7 @@ public record CadastradorUsuarioDto(
         Endereco endereco,
         Set<Documento> documentos,
         Set<Email> emails,
-        Set<CredencialUsuarioSenha> credenciais,
+        Credencial credencial,
         Set<Mercadoria> mercadorias,
         Set<Venda> vendas,
         Set<Veiculo> veiculos

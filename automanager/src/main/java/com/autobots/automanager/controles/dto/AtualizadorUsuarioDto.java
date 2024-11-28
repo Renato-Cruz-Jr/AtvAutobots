@@ -13,7 +13,7 @@ public record AtualizadorUsuarioDto(
         Optional<Endereco> endereco,
         Optional<Set<Documento>> documentos,
         Optional<Set<Email>> emails,
-        Optional<Set<CredencialUsuarioSenha>> credenciais,
+        Optional<Credencial> credencial,
         Optional<Set<Mercadoria>> mercadorias,
         Optional<Set<Venda>> vendas,
         Optional<Set<Veiculo>> veiculos
