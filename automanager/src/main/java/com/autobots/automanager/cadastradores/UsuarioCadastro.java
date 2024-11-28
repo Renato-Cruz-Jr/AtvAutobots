@@ -47,16 +47,12 @@ public class UsuarioCadastro {
             usuarioCadastrado.getEmails().add(emailCadastrado);
         }
 
-        Set<CredencialUsuarioSenha> credenciaisUsuarioSenha = usuario.credenciais();
-
-        for (CredencialUsuarioSenha credencialUsuarioSenha : credenciaisUsuarioSenha) {
-            CredencialUsuarioSenha credencial = new CredencialUsuarioSenha();
-            credencial.setNomeUsuario(credencialUsuarioSenha.getNomeUsuario());
-            credencial.setSenha(credencialUsuarioSenha.getSenha());
+        if (usuario.credencial() != null) {
+            Credencial credencial = new Credencial();
+            credencial.setNomeUsuario(usuario.credencial().getNomeUsuario());
+            credencial.setSenha(usuario.credencial().getSenha());
             credencial.setInativo(false);
-            credencial.setCriacao(new Date());
-            credencial.setUltimoAcesso(new Date());
-            usuarioCadastrado.getCredenciais().add(credencial);
+            usuarioCadastrado.setCredencial(credencial);
         }
 
         if (usuario.mercadorias() != null) {
@@ -80,7 +76,6 @@ public class UsuarioCadastro {
         if (usuario.veiculos() != null) {
             usuarioCadastrado.setVeiculos(usuario.veiculos());
         }
-
         return usuarioCadastrado;
     }
 
@@ -123,25 +118,12 @@ public class UsuarioCadastro {
             usuarioCadastrado.getEmails().add(emailCadastrado);
         }
 
-        for (Credencial credencial : usuario.getCredenciais()) {
-            if (credencial instanceof CredencialUsuarioSenha) {
-                CredencialUsuarioSenha credencialCadastrada = new CredencialUsuarioSenha();
-                CredencialUsuarioSenha original = (CredencialUsuarioSenha) credencial;
-                credencialCadastrada.setNomeUsuario(original.getNomeUsuario());
-                credencialCadastrada.setSenha(original.getSenha());
-                credencialCadastrada.setInativo(false);
-                credencialCadastrada.setCriacao(new Date());
-                credencialCadastrada.setUltimoAcesso(new Date());
-                usuarioCadastrado.getCredenciais().add(credencialCadastrada);
-            } else if (credencial instanceof CredencialCodigoBarra) {
-                CredencialCodigoBarra credencialCadastrada = new CredencialCodigoBarra();
-                CredencialCodigoBarra original = (CredencialCodigoBarra) credencial;
-                credencialCadastrada.setCodigo(original.getCodigo());
-                credencialCadastrada.setInativo(false);
-                credencialCadastrada.setCriacao(new Date());
-                credencialCadastrada.setUltimoAcesso(new Date());
-                usuarioCadastrado.getCredenciais().add(credencialCadastrada);
-            }
+        if (usuario.getCredencial() != null) {
+            Credencial credencial = new Credencial();
+            credencial.setNomeUsuario(usuario.getCredencial().getNomeUsuario());
+            credencial.setSenha(usuario.getCredencial().getSenha());
+            credencial.setInativo(false);
+            usuarioCadastrado.setCredencial(credencial);
         }
 
         if (usuario.getMercadorias() != null) {

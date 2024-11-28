@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class EmpresaCadastro {
 
     @Autowired
-    private UsuarioCadastro cadastradorUsuario;
+    private UsuarioCadastro usuarioCadastro;
 
     @Autowired
     private MercadoriaCadastro mercadoriaCadastro;
@@ -48,7 +48,7 @@ public class EmpresaCadastro {
 
         if (empresa.getUsuarios() != null) {
             for (Usuario usuario : empresa.getUsuarios()) {
-                Usuario usuarioCadastrado = cadastradorUsuario.cadastrarUsuario(usuario);
+                Usuario usuarioCadastrado = usuarioCadastro.cadastrarUsuario(usuario);
                 empresaCadastrada.getUsuarios().add(usuarioCadastrado);
             }
         }
