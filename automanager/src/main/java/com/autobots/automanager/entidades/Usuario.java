@@ -1,14 +1,13 @@
 package com.autobots.automanager.entidades;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 import java.util.HashSet;
 import java.util.Set;
-import org.springframework.hateoas.RepresentationModel;
 import javax.persistence.*;
 import com.autobots.automanager.enumeracoes.PerfilUsuario;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 
 @Data
 @EqualsAndHashCode(exclude = { "mercadorias", "vendas", "veiculos" })
@@ -31,8 +30,8 @@ public class Usuario extends RepresentationModel<Usuario>{
 	private Set<Documento> documentos = new HashSet<>();
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<Email> emails = new HashSet<>();
-	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<Credencial> credenciais = new HashSet<>();
+	@OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)
+	private Credencial credencial;
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
 	private Set<Mercadoria> mercadorias = new HashSet<>();
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })

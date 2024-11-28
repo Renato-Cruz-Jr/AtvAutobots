@@ -1,3 +1,4 @@
+/*
 package com.autobots.automanager.entidades;
 
 import javax.persistence.Column;
@@ -16,4 +17,4 @@ public class CredencialUsuarioSenha extends Credencial {
 	private String nomeUsuario;
 	@Column(nullable = false)
 	private String senha;
-}
+}*/

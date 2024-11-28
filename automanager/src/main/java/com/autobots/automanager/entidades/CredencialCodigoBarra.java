@@ -1,3 +1,4 @@
+/*
 package com.autobots.automanager.entidades;
 
 import javax.persistence.Column;
@@ -13,4 +14,4 @@ import lombok.EqualsAndHashCode;
 public class CredencialCodigoBarra extends Credencial {
 	@Column(nullable = false, unique = true)
 	private long codigo;
-}
+}*/
